@@ -4,6 +4,7 @@ from fastapi import APIRouter, Body
 from fastapi.responses import RedirectResponse
 
 import aiohttp
+import jwt
 
 from src.config import settings
 from src.auth.oauth.oauth_google import generate_google_oauth_redirect_uri
@@ -29,8 +30,17 @@ async def handle_code(
                 "client_secret": settings.OAUTH_GOOGLE_CLIENT_SECRET,
                 "grant_type": "authorization_code",
                 "redirect_uri": "http://localhost:5500/auth/google",
-                "code": code
-            }
+                "code": code,
+            },
+            ssl = False
         ) as response:
             res = await response.json()
-            print(f"{res=}")
+            id_token = res["id_token"]
+            user_data = jwt.decode(
+                id_token,
+                algorithms=["RS256"],
+                options={"verify_signature": False}
+            )
+            return {
+                "user": user_data
+            }
