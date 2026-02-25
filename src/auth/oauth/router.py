@@ -18,8 +18,12 @@ def get_google_oauth_redirect_uri():
 
 @router.post("/google/callback")
 async def handle_code(
-    code: Annotated[str, Body(embed=True)]
+    code: Annotated[str, Body()],
+    state: Annotated[str, Body()]
 ):
+    #проверка на наличие стейта в бд или редисе
+    #защита от CSRF-атаки
+
     google_token_url = "https://oauth2.googleapis.com/token"
 
     async with aiohttp.ClientSession() as session:
@@ -34,8 +38,9 @@ async def handle_code(
             },
             ssl = False
         ) as response:
-            res = await response.json()
-            id_token = res["id_token"]
+            
+            id_token = await response.json()["id_token"]
+
             user_data = jwt.decode(
                 id_token,
                 algorithms=["RS256"],

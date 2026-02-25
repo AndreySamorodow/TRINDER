@@ -2,11 +2,11 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 
-import Home from './components/Home.vue';
+import Login from './components/Login.vue';
 import AuthGoogle from './components/AuthGoogle.vue';
 
 const routes = [
-    { path: '/', component: Home },
+    { path: '/login', component: Login },
     { path: '/auth/google', component: AuthGoogle }
 ];
 
