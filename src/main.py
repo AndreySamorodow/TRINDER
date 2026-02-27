@@ -1,33 +1,38 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from redis.asyncio import Redis
 
+from src.core.redis import redis_manager
 from src.auth import auth_router, oauth_router
 
 from src.database.database import engine, Base
+from src.config import settings
+
 from src.auth.models import User
 from src.profile.models import Profile, Preference
-from src.config import settings
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
 
-    redis = Redis(
-        host=settings.redis.host,
-        port=settings.redis.port,
-        db = settings.redis.db.cache
-    )
-    FastAPICache.init(
-        RedisBackend(redis),
-        prefix=settings.cache.prefix
-    )
+    try:
+        await redis_manager.connect()
+        logger.info("Приложение запущено с Redis")
+    except Exception as e:
+        logger.error(f"Приложение запущено БЕЗ Redis: {e}")
+
     yield
+
+    await redis_manager.disconnect()
+    logger.info("Приложение остановлено")
+
 
 app = FastAPI(lifespan=lifespan)
 
