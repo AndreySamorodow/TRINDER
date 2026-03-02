@@ -1,6 +1,5 @@
 import aiohttp
 from fastapi import HTTPException, status
-from fastapi.responses import RedirectResponse
 import jwt
 
 from src.auth.dependencies import create_access_token
@@ -75,5 +74,3 @@ class OAuthService:
             response.set_cookie("TRINDER_ACCESS_TOKEN", access_token, httponly=True)
         else:
             await UserDao.add(db=db, email=email, oauth=True)
-
-        return RedirectResponse(url="http://localhost:5500", status_code=200)
