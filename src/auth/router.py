@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response
 
 from src.auth.service import UserService
 from src.database.database import DbSession
-from src.auth.shemas import UserCreate, UserLogin
+from src.auth.schemas import UserCreate, UserLogin
 
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
@@ -17,3 +17,6 @@ async def login(response: Response, user_data: UserLogin, db: DbSession):
     service = UserService(db)
     return await service.login(user_data, response)
 
+@router.post("/logout")
+async def logout_user(response: Response):
+    response.delete_cookie("TRINDER_ACCESS_TOKEN")

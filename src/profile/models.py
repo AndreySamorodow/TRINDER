@@ -28,3 +28,4 @@ class Preference(Base):
     gender = Column(String)
 
     profile = relationship("Profile", back_populates="preferences")
+    

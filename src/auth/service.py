@@ -1,8 +1,8 @@
-from fastapi import HTTPException, Response
+from fastapi import HTTPException, Response, status
 
 from src.auth.dependencies import create_access_token, get_password_hash
 from src.auth.repository import UserRepository
-from src.auth.shemas import UserCreate, UserLogin
+from src.auth.schemas import UserCreate, UserLogin
 
 from src.database.dao import UserDao
 
@@ -24,5 +24,5 @@ class UserService:
         user = await self.user_repository.verify_login_data(user_data)
         access_token = create_access_token({"sub": str(user.id)})
         response.set_cookie("TRINDER_ACCESS_TOKEN", access_token, httponly=True)
-        return user
+        raise HTTPException(status_code=status.HTTP_200_OK)
 

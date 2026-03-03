@@ -7,6 +7,7 @@ from redis.asyncio import Redis
 
 from src.core.redis import redis_manager
 from src.auth import auth_router, oauth_router
+from src.profile import profile_router
 
 from src.database.database import engine, Base
 from src.config import settings
@@ -38,6 +39,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(auth_router)
 app.include_router(oauth_router)
+app.include_router(profile_router)
 
 app.add_middleware(
     CORSMiddleware,
