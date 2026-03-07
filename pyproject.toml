@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiobotocore>=3.2.1",
     "aiohttp>=3.13.3",
     "aiohttpx>=0.0.12",
     "aioredis>=2.0.1",

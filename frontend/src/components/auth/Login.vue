@@ -79,7 +79,7 @@ export default {
             password: this.password,
             oauth: false
           }),
-          credentials: 'include' // для отправки cookies
+          credentials: 'include'
         })
         
         const data = await response.json()
@@ -93,8 +93,10 @@ export default {
           localStorage.setItem('token', data.access_token)
         }
         
-        // Перенаправляем на главную
-        window.location.href = '/dashboard'
+        // Небольшая задержка для сохранения cookie
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 100)
         
       } catch (err) {
         this.error = err.message

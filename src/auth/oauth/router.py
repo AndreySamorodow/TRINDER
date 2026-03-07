@@ -10,7 +10,7 @@ from src.auth.oauth.service import OAuthService
 from src.core.redis import RedisSession
 
 
-router = APIRouter(prefix="/api/oauth", tags=["Auth"])
+router = APIRouter(prefix="/api/oauth", tags=["OAuth"])
 
 @router.get("/google/url")
 async def get_google_oauth_redirect_uri(redis: RedisSession):

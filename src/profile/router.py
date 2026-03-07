@@ -24,6 +24,4 @@ async def get_profile_by_id(user_id: int, db: DbSession):
 @router.post("/create")
 async def create_profile(user_id: UserId, user_data:ProfileCreate, db: DbSession):
     service = ProfileService(db)
-    return await service.create_profile(user_id, user_data)
-
-# изменить предпочтения
+    return await service.create_or_change_profile(user_id, user_data)

@@ -1,6 +1,5 @@
 from src.profile.models import Profile
 from src.profile.schemas import ProfileCreate
-from src.dependencies.user import get_user_id
 from src.profile.repository import ProfileRepository
 
 
@@ -12,10 +11,11 @@ class ProfileService:
     async def get_profile(self, user_id):
         return await self.profile_repository.get_profile_by_id(user_id)
 
-    async def create_profile(self, user_id, user_data: ProfileCreate):
+    async def create_or_change_profile(self, user_id, user_data: ProfileCreate):
         existing_profile = await self.profile_repository.get_profile_by_id(user_id=user_id)
         
         profile_dict = user_data.model_dump()
+        profile_dict["user_id"] = user_id
         profile_dict["id"] = user_id
         
         if existing_profile:
@@ -28,6 +28,4 @@ class ProfileService:
         else:
             new_profile = Profile(**profile_dict)
             return await self.profile_repository.create_profile(new_profile)
-
-            
-           
+        

@@ -15,7 +15,8 @@ class UserRepository:
         if user:
             if not user.oauth:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A user with this email address already exists")
-            
+            else:
+                return user
         if user_data.password != user_data.password_replay:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password repetition")
 
@@ -33,4 +34,3 @@ class UserRepository:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The password is incorrect")
         
         return user
-
