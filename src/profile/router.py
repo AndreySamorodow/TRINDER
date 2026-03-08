@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, File, UploadFile
 
+from src.profile.dependencies import parse_profile_create
 from src.profile.schemas import ProfileCreate
 from src.dependencies.user import UserId
 from src.profile.service import ProfileService
@@ -22,6 +23,11 @@ async def get_profile_by_id(user_id: int, db: DbSession):
 
 # изменить профиль
 @router.post("/create")
-async def create_profile(user_id: UserId, user_data:ProfileCreate, db: DbSession):
+async def create_profile(
+    user_id: UserId,
+    db: DbSession,
+    user_data: ProfileCreate = Depends(parse_profile_create),
+    photo: UploadFile = File(...)
+    ):
     service = ProfileService(db)
-    return await service.create_or_change_profile(user_id, user_data)
+    return await service.create_or_change_profile(user_id, user_data, photo)

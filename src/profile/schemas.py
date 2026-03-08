@@ -8,6 +8,7 @@ class ProfileCreate(BaseModel):
     age: int = Field(..., gt=12)
     gender: str
     
+    
 
 
     @field_validator('city')

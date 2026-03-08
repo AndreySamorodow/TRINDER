@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
 
+    #S3
+    S3_ACCESS_KEY:str
+    S3_SECRET_KEY:str
+    S3_BUCKET_NAME: str
+    S3_DOMEN: str
+
     model_config = SettingsConfigDict(
         env_file=".env"
     )

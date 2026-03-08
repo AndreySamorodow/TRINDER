@@ -1,6 +1,8 @@
+import asyncio
 from contextlib import asynccontextmanager
-
 from aiobotocore.session import get_session
+
+from src.config import settings
 
 
 class S3Client:
@@ -37,3 +39,20 @@ class S3Client:
                 Key=object_name,
                 Body=file
             )
+
+        return f"https://{settings.S3_DOMEN}.selstorage.ru/{object_name}"
+
+
+
+s3_client = S3Client(
+    access_key=settings.S3_ACCESS_KEY,
+    secret_key=settings.S3_SECRET_KEY,
+    endpoint_url="https://s3.ru-3.storage.selcloud.ru",
+    bucket_name=settings.S3_BUCKET_NAME
+)
+{
+"name":"fqwegwrbertbert",
+"city":"NNDniwndiw",
+"age":"13",
+"gender":"male",
+}
