@@ -33,5 +33,4 @@ async def handle_code(
     id_token = token_data["id_token"]
     user_data = service.decode_google_token(id_token)
 
-    await service.login_with_oauth(response, db, user_data["email"])
-    return RedirectResponse(url="http://localhost:5500", status_code=200)
+    return await service.login_with_oauth(response, db, user_data["email"])

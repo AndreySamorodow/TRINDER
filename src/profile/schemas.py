@@ -8,9 +8,6 @@ class ProfileCreate(BaseModel):
     age: int = Field(..., gt=12)
     gender: str
     
-    
-
-
     @field_validator('city')
     def validate_city(cls, v):
         v = v.strip().title()
@@ -23,3 +20,13 @@ class ProfileCreate(BaseModel):
             
         return v
 
+class ProfileResponse(BaseModel):
+    id: int
+    name: str
+    city: str
+    age: int
+    gender: str
+    photo: str
+    
+    class Config:
+        from_attributes = True

@@ -72,5 +72,14 @@ class OAuthService:
         if user:
             access_token = create_access_token({"sub": str(user.id)})
             response.set_cookie("TRINDER_ACCESS_TOKEN", access_token, httponly=True)
+            return {
+            "access_token": access_token
+            }
         else:
             await UserDao.add(db=db, email=email, oauth=True)
+            user = await UserDao.find_one_or_none(db, email=email)
+            access_token = create_access_token({"sub": str(user.id)})
+            response.set_cookie("TRINDER_ACCESS_TOKEN", access_token, httponly=True)
+            return {
+            "access_token": access_token
+            }

@@ -7,7 +7,8 @@ from alembic import context
 
 from src.database.database import Base
 from src.auth.models import User
-from src.profile.models import Preference, Profile
+from src.profile.models import Profile
+from src.profile.preference.models import Preference
 
 
 # this is the Alembic Config object, which provides

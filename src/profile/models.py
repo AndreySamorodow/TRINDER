@@ -12,21 +12,7 @@ class Profile(Base):
     city = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String, nullable=False)
-    photo = Column(String)
+    photo = Column(String, default="https://9e72a0d7-ed69-469e-9eed-34406680ef1c.selstorage.ru/0")
 
     user = relationship("User", back_populates="profile")
-    preferences = relationship("Preference", back_populates="profile", uselist=False, cascade="all, delete-orphan")
 
-
-
-class Preference(Base):
-    __tablename__ = "preferences"
-
-    id = Column(Integer, primary_key=True)
-    profile_id = Column(Integer, ForeignKey('profiles.id'))
-
-    age = Column(Integer)
-    gender = Column(String)
-
-    profile = relationship("Profile", back_populates="preferences")
-    

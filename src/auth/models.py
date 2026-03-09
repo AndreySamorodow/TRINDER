@@ -13,3 +13,4 @@ class User(Base):
     oauth = Column(Boolean, nullable=False, default=False)
 
     profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    preference = relationship("Preference", back_populates="user", uselist=False, cascade="all, delete-orphan")
