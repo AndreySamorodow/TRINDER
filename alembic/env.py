@@ -9,6 +9,7 @@ from src.database.database import Base
 from src.auth.models import User
 from src.profile.models import Profile
 from src.profile.preference.models import Preference
+from src.swipe.models import Swipe
 
 
 # this is the Alembic Config object, which provides

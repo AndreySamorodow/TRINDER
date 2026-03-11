@@ -8,6 +8,7 @@ from redis.asyncio import Redis
 from src.core.redis import redis_manager
 from src.auth import auth_router, oauth_router
 from src.profile import profile_router, preference_router
+from src.swipe import swipe_router
 
 from src.database.database import engine, Base
 from src.config import settings
@@ -15,6 +16,7 @@ from src.config import settings
 from src.auth.models import User
 from src.profile.models import Profile
 from src.profile.preference.models import Preference
+from src.swipe.models import Swipe
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,6 +44,7 @@ app.include_router(auth_router)
 app.include_router(oauth_router)
 app.include_router(profile_router)
 app.include_router(preference_router)
+app.include_router(swipe_router)
 
 app.add_middleware(
     CORSMiddleware,
