@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request, status
@@ -6,6 +6,16 @@ from jose import JWTError
 import jwt
 
 from src.config import settings
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=60)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, settings.ALGORITHM
+    )
+    return encoded_jwt
+
 
 def get_token(request: Request):
     token = request.cookies.get("TRINDER_LAST_PROFILE_ID")
@@ -22,14 +32,14 @@ async def get_last_profile_id(token = Depends(get_token)):
 
         expire = payload.get("exp")
         if (not expire) or (int(expire) < datetime.now(timezone.utc).timestamp()):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-        user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+            return 0
+        last_profile_id = payload.get("sub")
+        if not last_profile_id:
+            return 0
                 
-        return int(user_id)
+        return int(last_profile_id)
     
     else:
-        return None
+        return 0
 
-UserId = Annotated[int, Depends(get_last_profile_id)]
+LastProfileId = Annotated[int, Depends(get_last_profile_id)]

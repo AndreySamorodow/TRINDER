@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Response, status
 
-from src.auth.dependencies import create_access_token, get_password_hash
+from src.dependencies.user import create_access_token, get_password_hash
 from src.auth.repository import UserRepository
 from src.auth.schemas import UserCreate, UserLogin
 

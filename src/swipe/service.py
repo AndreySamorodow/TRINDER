@@ -1,8 +1,10 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Response, status
 from sqlalchemy import select, and_, or_, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 
+from src.profile.schemas import ProfileResponseList
+from src.dependencies.user import create_access_token
 from src.profile.models import Profile
 from src.profile.preference.models import Preference
 from src.swipe.models import Swipe
@@ -14,15 +16,16 @@ class SwipeService:
 
     async def get_profiles(
         self,
+        response: Response,
         current_user_id: int,
-        last_profile_id: Optional[int] = None   # id последней анкеты из предыдущей выдачи
+        last_profile_id: Optional[int] = 0   # id последней анкеты из предыдущей выдачи
     ) -> List[Profile]:
         stmt = select(Profile).where(Profile.user_id == current_user_id)
         result = await self.db.execute(stmt)
         current_profile = result.scalar_one_or_none()
 
         if not current_profile:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Profile not found")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Profile not found!")
 
         stmt = select(Preference).where(Preference.user_id == current_user_id)
         result = await self.db.execute(stmt)
@@ -55,11 +58,20 @@ class SwipeService:
             )
         )
 
-        if last_profile_id is not None:
+        if last_profile_id != 0:
             stmt = stmt.where(Profile.id > last_profile_id)
 
         stmt = stmt.order_by(Profile.id.desc()).limit(30)
 
         result = await self.db.execute(stmt)
-        return result.scalars().all()
-    
+        profiles = result.scalars().all()
+
+        if profiles:
+            last_profile_id = profiles[-1].id
+        else:
+            last_profile_id = last_profile_id
+
+        last_profile_id_token = create_access_token({"sub": str(last_profile_id)})
+        response.set_cookie("TRINDER_LAST_PROFILE_ID", last_profile_id_token, httponly=True)
+
+        return ProfileResponseList(profiles=list(reversed(profiles)))

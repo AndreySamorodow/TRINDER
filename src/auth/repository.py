@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 
-from src.auth.dependencies import verify_password
+from src.dependencies.user import verify_password
 from src.auth.schemas import UserCreate, UserLogin
 from src.database.dao import UserDao
 

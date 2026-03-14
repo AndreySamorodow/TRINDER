@@ -2,7 +2,7 @@ import aiohttp
 from fastapi import HTTPException, status
 import jwt
 
-from src.auth.dependencies import create_access_token
+from src.dependencies.user import create_access_token
 from src.database.dao import UserDao
 from src.config import settings
 

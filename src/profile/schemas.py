@@ -30,3 +30,7 @@ class ProfileResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+class ProfileResponseList(BaseModel):
+    profiles: list[ProfileResponse]
