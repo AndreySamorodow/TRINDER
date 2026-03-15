@@ -16,6 +16,16 @@ async def picker(
     user_id: UserId,
     db:DbSession,
     last_profile_id: LastProfileId
-    ) -> ProfileResponseList:
+) -> ProfileResponseList:
     service = SwipeService(db)
     return await service.get_profiles(response, user_id, last_profile_id)
+
+@router.post("/{swipe_id}")
+async def swipe(
+    user_id: UserId,
+    swipe_id: int,
+    db:DbSession,
+):
+    service = SwipeService(db)
+    return await service.swipe(user_id, swipe_id)
+

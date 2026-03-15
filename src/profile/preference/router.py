@@ -15,7 +15,7 @@ async def get_my_preference(db: DbSession, user_id:UserId) -> PreferenceResponse
     return await service.get_preference(user_id)
 
 @router.get("/{user_id}")
-async def get_my_preference(user_id: int, db: DbSession) -> PreferenceResponse:
+async def get_preference_by_id(user_id: int, db: DbSession) -> PreferenceResponse:
     service = PreferenceService(db)
     return await service.get_preference(user_id)
 
