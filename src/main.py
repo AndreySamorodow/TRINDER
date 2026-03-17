@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from redis.asyncio import Redis
 
 from src.core.redis import redis_manager
+from src.core.kafka import kafka_producer
+
 from src.auth import auth_router, oauth_router
 from src.profile import profile_router, preference_router
 from src.swipe import swipe_router
@@ -23,19 +25,20 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger.info("Starting up...")
+
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
 
-    try:
-        await redis_manager.connect()
-        logger.info("Приложение запущено с Redis")
-    except Exception as e:
-        logger.error(f"Приложение запущено БЕЗ Redis: {e}")
+    await redis_manager.start()
+    await kafka_producer.start()
 
     yield
 
-    await redis_manager.disconnect()
-    logger.info("Приложение остановлено")
+    await kafka_producer.stop()
+    await redis_manager.stop()
+
+    logger.info("App is stopped")
 
 
 app = FastAPI(title="TRINDER", lifespan=lifespan)

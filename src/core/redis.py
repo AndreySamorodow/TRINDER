@@ -14,8 +14,7 @@ class RedisManager:
         self._redis: Optional[Redis] = None
         self._initialized = False
     
-    async def connect(self):
-        """Подключение к Redis"""
+    async def start(self):
         if not self._initialized:
             try:
                 self._pool = ConnectionPool.from_url(
@@ -26,59 +25,46 @@ class RedisManager:
                 self._redis = Redis(connection_pool=self._pool)
                 await self._redis.ping()
                 self._initialized = True
-                logger.info("Redis подключен")
+                logger.info("Redis connected")
             except Exception as e:
-                logger.error(f"Ошибка подключения к Redis: {e}")
+                logger.error(f"Error Redis: {e}")
                 raise
     
-    async def disconnect(self):
-        """Отключение от Redis"""
+    async def stop(self):
         if self._redis:
             await self._redis.close()
         if self._pool:
             await self._pool.disconnect()
         self._initialized = False
-        logger.info("🔌 Redis отключен")
+        logger.info("Redis disconnected")
     
     @property
     def client(self) -> Redis:
-        """Получить клиент Redis"""
         if not self._initialized or self._redis is None:
-            raise RuntimeError("Redis не инициализирован. Вызовите connect() в lifespan")
+            raise RuntimeError("Redis is not initialized. Call connect() in lifespan")
         return self._redis
     
     @property
     def is_connected(self) -> bool:
-        """Проверить, подключен ли Redis"""
         return self._initialized and self._redis is not None
 
-# Создаем глобальный экземпляр менеджера
 redis_manager = RedisManager()
 
-# Функция зависимости для FastAPI
 async def get_redis():
-    """
-    Зависимость для получения Redis клиента.
-    Используйте: redis: RedisSession
-    """
     if not redis_manager.is_connected:
-        # Вместо RuntimeError возвращаем понятную ошибку
         raise HTTPException(
             status_code=503,
-            detail="Redis сервис временно недоступен. Попробуйте позже."
+            detail="Redis service is temporarily unavailable. Please try again later."
         )
     
     try:
-        # Проверяем, что соединение живо
         await redis_manager.client.ping()
         return redis_manager.client
     except Exception as e:
-        logger.error(f"Ошибка при получении Redis клиента: {e}")
+        logger.error(f"Error while receiving Redis client: {e}")
         raise HTTPException(
             status_code=503,
-            detail="Redis сервис недоступен"
+            detail="Redis service is unavailable"
         )
-
-# Создаем тип для аннотации
 
 RedisSession = Annotated[Redis, Depends(get_redis)]

@@ -2,6 +2,7 @@ from fastapi import HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 
+from src.kafka.service import KafkaService
 from src.profile.preference.repository import PreferenceRepository
 from src.profile.repository import ProfileRepository
 from src.profile.models import Profile
@@ -14,6 +15,7 @@ class SwipeService:
         self.swipe_repository = SwipeRepository(db)
         self.profile_repository = ProfileRepository(db)
         self.preference_repository = PreferenceRepository(db)
+        self.kafka_service = KafkaService()
 
 
     async def get_profiles(
@@ -68,6 +70,7 @@ class SwipeService:
         
         else:  #если нет -> создание в бд и отправка .вы понравились тому то.
             await self.swipe_repository.create_swipe(user1=user_id, user2=swipe_id)
+            await self.kafka_service.notify_swipe()
             #...отправка в брокер сообщений
 
         
