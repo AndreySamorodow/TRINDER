@@ -34,3 +34,7 @@ class ProfileResponse(BaseModel):
 
 class ProfileResponseList(BaseModel):
     profiles: list[ProfileResponse]
+
+class TelegramBindSchema(BaseModel):
+    telegram_id: int
+    code: str

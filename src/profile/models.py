@@ -13,7 +13,7 @@ class Profile(Base):
     age = Column(Integer, nullable=False)
     gender = Column(String, nullable=False)
     photo = Column(String, default="https://9e72a0d7-ed69-469e-9eed-34406680ef1c.selstorage.ru/0")
-    tg_username = Column(String, nullable=False)
+    telegram_id = Column(Integer)
 
     user = relationship("User", back_populates="profile")
 
