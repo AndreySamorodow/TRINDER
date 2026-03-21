@@ -27,7 +27,6 @@ class KafkaProducer:
     async def send(self, topic: str, message: dict):
         try:
             await self.producer.send(topic, value=message)
-            logger.info(f"Message sent to {topic}: {message}")
         except Exception as e:
             logger.error(f"Failed to send message: {e}")
 

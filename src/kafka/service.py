@@ -5,11 +5,11 @@ class KafkaService:
     def __init__(self):
         self.kafka_producer = kafka_producer
 
-    async def notify_first_swipe(self, user_tg_id_recipient: int, username: str):
+    async def notify_swipe(self, user_tg_id_recipient: int, username: str):
         notification = {
             "type": "tg",
             "recipient": user_tg_id_recipient,
-            "body": f"Привет тебя свайпнули) --> ❤️{username}❤️"
+            "body": f"Тебя свайпнули) --> ❤️{username}❤️"
         }
         await self.kafka_producer.send("notifications", notification)
 
@@ -17,6 +17,6 @@ class KafkaService:
         notification = {
             "type": "tg",
             "recipient": user_tg_id_recipient,
-            "body": f"Привет, у тебя мэтч с {username}❤️"
+            "body": f"У тебя мэтч с {username}❤️"
         }
         await self.kafka_producer.send("notifications", notification)

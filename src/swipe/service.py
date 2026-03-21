@@ -46,6 +46,8 @@ class SwipeService:
     async def swipe(self, user_id, swipe_id):
         #проверка существует ли пользователь которого свайпают
         swipe_user = await self.profile_repository.get_profile_by_id(swipe_id)
+        user = await self.profile_repository.get_profile_by_id(user_id)
+
         if not swipe_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The user does not exist")
         
@@ -66,11 +68,10 @@ class SwipeService:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You've already swiped this person")
             swipe.decision2 = True
             await self.db.commit()
-            #...отправка в брокер сообщений
+            await self.kafka_service.notify_match(swipe_user.telegram_id, user.name)
         
         else:  #если нет -> создание в бд и отправка .вы понравились тому то.
             await self.swipe_repository.create_swipe(user1=user_id, user2=swipe_id)
-            await self.kafka_service.notify_swipe()
-            #...отправка в брокер сообщений
+            await self.kafka_service.notify_swipe(swipe_user.telegram_id, user.name)
 
         
