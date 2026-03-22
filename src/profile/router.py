@@ -30,11 +30,12 @@ async def get_profile_by_id(user_id: int, db: DbSession) -> ProfileResponse:
 async def create_profile(
         user_id: UserId,
         db: DbSession,
+        redis: RedisSession,
         user_data: ProfileCreate = Depends(parse_profile_create),
         photo: Optional[UploadFile] = File(None)
     ) -> ProfileResponse:
     service = ProfileService(db)
-    return await service.create_or_change_profile(user_id, user_data, photo)
+    return await service.create_or_change_profile(redis, user_id, user_data, photo)
 
 # редирект в телеграм для аутентификации
 @router.post("/link_tg")
@@ -48,6 +49,8 @@ async def link_an_tg(
     print(url)
     return RedirectResponse(url)
 
+
+#For TelegramAPI
 @router.post("/auth/telegram-bind")
 async def bind_telegram_account(
     data: TelegramBindSchema,

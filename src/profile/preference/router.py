@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from src.core.redis import RedisSession
 from src.profile.preference.schemas import PreferenceCreate, PreferenceResponse
 from src.profile.preference.service import PreferenceService
 from src.dependencies.user import UserId
@@ -25,7 +26,8 @@ async def get_preference_by_id(user_id: int, db: DbSession) -> PreferenceRespons
 async def create_preference(
     user_id: UserId,
     db: DbSession,
+    redis: RedisSession,
     user_data: PreferenceCreate
     ) -> PreferenceResponse:
     service = PreferenceService(db)
-    return await service.create_or_change_preference(user_id, user_data)
+    return await service.create_or_change_preference(redis, user_id, user_data)

@@ -62,7 +62,7 @@ class SwipeRepository:
         response.set_cookie("TRINDER_LAST_PROFILE_ID", last_profile_id_token, httponly=True)
 
         return ProfileResponseList(profiles=list(reversed(profiles)))
-    
+
 
     async def get_swipe(self, **filters):
         stmt = select(Swipe).filter_by(**filters)
@@ -86,4 +86,3 @@ class SwipeRepository:
         except Exception as e:
             await self.db.rollback()
             raise e
-        

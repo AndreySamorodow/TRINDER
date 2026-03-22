@@ -7,6 +7,7 @@ from redis.asyncio import Redis
 
 from src.core.redis import redis_manager
 from src.core.kafka import kafka_producer
+from src.core.scheduler import start_scheduler, stop_scheduler
 
 from src.auth import auth_router, oauth_router
 from src.profile import profile_router, preference_router
@@ -32,9 +33,11 @@ async def lifespan(app: FastAPI):
 
     await redis_manager.start()
     await kafka_producer.start()
+    start_scheduler()
 
     yield
 
+    stop_scheduler()
     await kafka_producer.stop()
     await redis_manager.stop()
 
@@ -56,3 +59,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from src.core.scheduler import build_decks_job
+
+@app.post("/test-build-decks")
+async def manual_build():
+    await build_decks_job()
+    return {"status": "done"}

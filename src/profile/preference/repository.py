@@ -1,9 +1,6 @@
-
-
-
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
+from src.profile.preference.models import Preference
 from src.profile.preference.schemas import PreferenceResponse
 from src.auth.models import User
 
@@ -12,15 +9,10 @@ class PreferenceRepository:
     def __init__(self, db):
         self.db = db
 
-    async def get_preference_by_id(self, user_id: int):
-        query = (
-            select(User)
-            .where(User.id == user_id)
-            .options(joinedload(User.profile), joinedload(User.preference))
-        )
-        result = await self.db.execute(query)
-        user = result.unique().scalar_one_or_none()
-        return user.preference if user else None
+    async def get_preference_by_id(self, user_id: int) -> Preference | None:
+        stmt = select(Preference).where(Preference.user_id == user_id)
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
     
 
     async def create_preference(self, preference) -> PreferenceResponse:
@@ -33,4 +25,3 @@ class PreferenceRepository:
         except Exception as e:
             await self.db.rollback()
             raise e
-        

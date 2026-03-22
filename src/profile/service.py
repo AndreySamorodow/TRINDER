@@ -23,7 +23,7 @@ class ProfileService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profil not found")
         return ProfileResponse.model_validate(profile)
 
-    async def create_or_change_profile(self, user_id: int, user_data: ProfileCreate, photo) -> ProfileResponse:
+    async def create_or_change_profile(self, redis, user_id: int, user_data: ProfileCreate, photo) -> ProfileResponse:
         existing_profile = await self.profile_repository.get_profile_by_id(user_id=user_id)
 
         profile_dict = user_data.model_dump()
@@ -45,10 +45,15 @@ class ProfileService:
 
             await self.db.commit()
             await self.db.refresh(existing_profile)
+
+            await self.profile_repository.rebuild_user_deck(user_id, redis)
+
             return existing_profile
         else:
             new_profile = Profile(**profile_dict)
-            return await self.profile_repository.create_profile(new_profile)
+            profile = await self.profile_repository.create_profile(new_profile)
+            await self.profile_repository.rebuild_user_deck(user_id, redis)
+            return profile
 
 
     async def get_link_tg_url(self, user_id: int, redis):

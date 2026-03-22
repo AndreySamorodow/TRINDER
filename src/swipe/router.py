@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Response
 
+from src.core.redis import RedisSession
 from src.profile.schemas import ProfileResponseList
 from src.dependencies.swipe import LastProfileId
 from src.database.database import DbSession
@@ -15,17 +16,19 @@ async def picker(
     response: Response,
     user_id: UserId,
     db:DbSession,
+    redis: RedisSession,
     last_profile_id: LastProfileId
 ) -> ProfileResponseList:
-    service = SwipeService(db)
+    service = SwipeService(db, redis)
     return await service.get_profiles(response, user_id, last_profile_id)
+
 
 @router.post("/{swipe_id}")
 async def swipe(
     user_id: UserId,
     swipe_id: int,
     db:DbSession,
+    redis: RedisSession
 ):
-    service = SwipeService(db)
+    service = SwipeService(db, redis)
     return await service.swipe(user_id, swipe_id)
-
