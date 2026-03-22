@@ -8,7 +8,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    email = Column(String, nullable=False)
+    email = Column(String, nullable=False, index=True, unique=True)
     password = Column(String)
     oauth = Column(Boolean, nullable=False, default=False)
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import relationship
 
 from src.database.database import Base
@@ -7,7 +7,7 @@ class Profile(Base):
     __tablename__ = "profiles"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
     name = Column(String, nullable=False)
     city = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
@@ -17,3 +17,6 @@ class Profile(Base):
 
     user = relationship("User", back_populates="profile")
 
+    __table_args__ = (
+        Index('ix_profiles_search', 'gender', 'city', 'age', 'user_id'),
+    )
