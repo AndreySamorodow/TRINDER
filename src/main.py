@@ -3,6 +3,10 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
 from redis.asyncio import Redis
 
 from src.core.redis import redis_manager
@@ -24,6 +28,13 @@ from src.swipe.models import Swipe
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+logging.basicConfig(level=logging.DEBUG)
+logging.getLogger("fastapi_cache").setLevel(logging.DEBUG)
+
+# Опционально: логи Redis
+logging.getLogger("redis").setLevel(logging.DEBUG)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting up...")
@@ -31,7 +42,16 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
 
-    await redis_manager.start()
+    redis = Redis(
+        host=settings.redis.host,
+        port=settings.redis.port,
+        db=settings.redis.db.cache,
+    )
+    FastAPICache.init(RedisBackend(redis), prefix=settings.cache.prefix)
+
+
+
+    # await redis_manager.start()
     await kafka_producer.start()
     start_scheduler()
 
@@ -39,7 +59,7 @@ async def lifespan(app: FastAPI):
 
     stop_scheduler()
     await kafka_producer.stop()
-    await redis_manager.stop()
+    #await redis_manager.stop()
 
     logger.info("App is stopped")
 

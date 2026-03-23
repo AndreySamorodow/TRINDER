@@ -1,9 +1,14 @@
-from redis.asyncio import Redis, ConnectionPool
-from typing import Optional, Annotated
 import logging
-from fastapi import Depends, HTTPException
 
+from typing import Any, Callable, Dict, Optional, Annotated, Tuple
+
+from redis.asyncio import Redis, ConnectionPool
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException, Request, Response
+
+from src.dependencies.user import get_user_id
 from src.config import settings
+
 
 logger = logging.getLogger(__name__)
 
@@ -68,3 +73,24 @@ async def get_redis():
         )
 
 RedisSession = Annotated[Redis, Depends(get_redis)]
+
+
+#for fastapi-cache
+async def trinder_key_builder(
+    func: Callable[..., Any],
+    namespace: str = "",
+    *,
+    request: Optional[Request] = None,
+    response: Optional[Response] = None,
+    args: Tuple[Any, ...],
+    kwargs: Dict[str, Any],
+) -> str:
+    user_id = 'anonymous'
+    
+    if request:
+        token = request.cookies.get('TRINDER_ACCESS_TOKEN')
+        if token:
+            user_id = await get_user_id(token)
+    
+    cache_key = f"{namespace}:{func.__name__}:user_id={user_id}"
+    return cache_key

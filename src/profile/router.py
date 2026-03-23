@@ -1,21 +1,27 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Request, UploadFile
 from fastapi.responses import RedirectResponse
+from fastapi_cache.decorator import cache
 
-from src.core.redis import RedisSession
+from src.core.redis import RedisSession, trinder_key_builder
 from src.profile.dependencies import parse_profile_create
 from src.profile.schemas import ProfileCreate, ProfileResponse, TelegramBindSchema
 from src.dependencies.user import UserId
 from src.profile.service import ProfileService
 from src.database.database import DbSession
-
+from src.config import settings
 
 router = APIRouter(prefix="/api/profile", tags=["Profile"])
 
 # просмотр моего профиля
 @router.get("")
-async def get_profile(db: DbSession, user_id: UserId) -> ProfileResponse:
+@cache(
+    expire=60,
+    key_builder=trinder_key_builder,
+    namespace=settings.cache.namespace.profiles_list,
+    )
+async def get_profile(request: Request, db: DbSession, user_id: UserId) -> ProfileResponse:
     service = ProfileService(db)
     return await service.get_profile(user_id)
 

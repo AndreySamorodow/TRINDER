@@ -1,7 +1,31 @@
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class RedisDB(BaseModel):
+    cache: int = 0
+
+class RedisConfig(BaseModel):
+    host: str = "localhost"
+    port: int = 6379
+    db: RedisDB = RedisDB()
+
+class CacheNamespace(BaseModel):
+    users_list: str = "users-list"
+    profiles_list: str = "profiles_list"
+
+class CacheConfig(BaseModel):
+    prefix: str = "fastapi-cache"
+    namespace: CacheNamespace = CacheNamespace()
+
+
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
+
+
     DATABASE_URL: str
     REDIS_URL: str
 
@@ -17,11 +41,10 @@ class Settings(BaseSettings):
     S3_SECRET_KEY:str
     S3_BUCKET_NAME: str
     S3_DOMEN: str
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        extra="ignore"
-    )
+    redis: RedisConfig = RedisConfig()
+    cache: CacheConfig = CacheConfig()
+    
+    
 
 
 settings = Settings()
