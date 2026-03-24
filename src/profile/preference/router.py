@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi_cache.decorator import cache
 
 from src.core.redis import RedisSession
 from src.profile.preference.schemas import PreferenceCreate, PreferenceResponse
@@ -15,7 +16,9 @@ async def get_my_preference(db: DbSession, user_id:UserId) -> PreferenceResponse
     service = PreferenceService(db)
     return await service.get_preference(user_id)
 
+
 @router.get("/{user_id}")
+@cache(expire=60)
 async def get_preference_by_id(user_id: int, db: DbSession) -> PreferenceResponse:
     service = PreferenceService(db)
     return await service.get_preference(user_id)

@@ -16,17 +16,13 @@ router = APIRouter(prefix="/api/profile", tags=["Profile"])
 
 # просмотр моего профиля
 @router.get("")
-@cache(
-    expire=60,
-    key_builder=trinder_key_builder,
-    namespace=settings.cache.namespace.profiles_list,
-    )
-async def get_profile(request: Request, db: DbSession, user_id: UserId) -> ProfileResponse:
+async def get_profile(db: DbSession, user_id: UserId) -> ProfileResponse:
     service = ProfileService(db)
     return await service.get_profile(user_id)
 
 # просмотр профиля по ID
 @router.get("/{user_id}")
+@cache(expire=60)
 async def get_profile_by_id(user_id: int, db: DbSession) -> ProfileResponse:
     service = ProfileService(db)
     return await service.get_profile(user_id)
